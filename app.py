@@ -160,5 +160,79 @@ def recommend():
     return jsonify({"recommendations": recommendations[:10]})
 
 
+@app.route("/movies/ratings", methods=["GET"])
+def list_ratings():
+    """List movies rated by a user. Query param: user_id"""
+    user_id = request.args.get("user_id")
+    if not user_id:
+        return jsonify({"error": "user_id required"}), 400
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        return jsonify({"error": "invalid user_id"}), 400
+
+    conn = get_db()
+    cur = conn.cursor()
+    rows = cur.execute("SELECT movie_id, rating FROM ratings WHERE user_id=?", (user_id,)).fetchall()
+    conn.close()
+
+    results = []
+    for r in rows:
+        movie_id = r[0]
+        rating = r[1]
+        movie_info = None
+        try:
+            # try to fetch movie details from TMDB
+            movie_info = tmdb_get(f"/movie/{movie_id}")
+        except Exception:
+            movie_info = None
+
+        results.append(
+            {
+                "movie_id": movie_id,
+                "title": movie_info.get("title") if movie_info else None,
+                "rating": rating,
+                "overview": movie_info.get("overview") if movie_info else None,
+                "poster": (TMDB_IMG_BASE + movie_info["poster_path"]) if movie_info and movie_info.get("poster_path") else None,
+                "vote_average": movie_info.get("vote_average") if movie_info else None,
+                "popularity": movie_info.get("popularity") if movie_info else None,
+            }
+        )
+
+    return jsonify({"rated": results})
+
+
+@app.route("/movies/search", methods=["GET"])
+def search_movies():
+    """Search movies by text query and return approximate matches with TMDB ids."""
+    q = request.args.get("query")
+    if not q:
+        return jsonify({"error": "query parameter required"}), 400
+
+    try:
+        data = tmdb_get("/search/movie", params={"query": q, "page": 1})
+        results = data.get("results", [])
+    except requests.HTTPError as e:
+        return jsonify({"error": "tmdb error", "detail": str(e)}), 502
+    except Exception as e:
+        return jsonify({"error": "unexpected error", "detail": str(e)}), 500
+
+    out = []
+    for m in results:
+        out.append(
+            {
+                "id": m.get("id"),
+                "title": m.get("title"),
+                "release_date": m.get("release_date"),
+                "overview": m.get("overview"),
+                "popularity": m.get("popularity"),
+                "vote_average": m.get("vote_average"),
+                "poster": (TMDB_IMG_BASE + m["poster_path"]) if m.get("poster_path") else None,
+            }
+        )
+
+    return jsonify({"query": q, "results": out})
+
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.getenv("PORT", 5000)))

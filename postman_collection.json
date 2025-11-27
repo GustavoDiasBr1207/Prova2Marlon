@@ -34,5 +34,21 @@
         "url": {"raw": "http://localhost:5000/movies/recommend?user_id=1", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["movies", "recommend"], "query": [{"key": "user_id", "value": "1"}]}
       }
     }
+    ,
+    {
+      "name": "List Ratings",
+      "request": {
+        "method": "GET",
+        "url": {"raw": "http://localhost:5000/movies/ratings?user_id=1", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["movies", "ratings"], "query": [{"key": "user_id", "value": "1"}]}
+      }
+    }
+    ,
+    {
+      "name": "Search Movies",
+      "request": {
+        "method": "GET",
+        "url": {"raw": "http://localhost:5000/movies/search?query=matrix", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["movies", "search"], "query": [{"key": "query", "value": "matrix"}]}
+      }
+    }
   ]
 }
