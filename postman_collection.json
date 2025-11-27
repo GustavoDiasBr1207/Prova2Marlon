@@ -1,0 +1,38 @@
+{
+  "info": {
+    "name": "Movie Recommender API",
+    "_postman_id": "d6f7a5d0-0000-0000-0000-000000000000",
+    "description": "Coleção simples para testar os endpoints do projeto",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Save Preferences",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": 1,\n  \"favorite_genres\": [\"Action\", \"Sci-Fi\"],\n  \"watched\": [603, 550]\n}"
+        },
+        "url": {"raw": "http://localhost:5000/user/preferences", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["user", "preferences"]}
+      }
+    },
+    {
+      "name": "Rate Movie",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\n  \"user_id\": 1,\n  \"movie_id\": 603,\n  \"rating\": 4\n}"},
+        "url": {"raw": "http://localhost:5000/movies/rate", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["movies", "rate"]}
+      }
+    },
+    {
+      "name": "Get Recommendations",
+      "request": {
+        "method": "GET",
+        "url": {"raw": "http://localhost:5000/movies/recommend?user_id=1", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["movies", "recommend"], "query": [{"key": "user_id", "value": "1"}]}
+      }
+    }
+  ]
+}
